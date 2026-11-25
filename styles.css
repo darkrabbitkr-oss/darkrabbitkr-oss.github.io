@@ -353,6 +353,111 @@ button {
   border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
 }
 
+.owner-stats-section {
+  padding: 20px 20px 0;
+}
+
+.owner-stats-section[hidden] {
+  display: none;
+}
+
+.owner-stats-card {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.owner-stats-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.owner-stats-note {
+  margin-top: 6px;
+  font-size: 0.84rem;
+  color: var(--ink-subtle);
+}
+
+.owner-stats-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.owner-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.owner-mini-btn:hover {
+  border-color: var(--gold);
+}
+
+.owner-stats-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.owner-kpi {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.owner-kpi span {
+  font-size: 0.78rem;
+  color: var(--ink-subtle);
+}
+
+.owner-kpi strong {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  color: var(--ink);
+}
+
+.owner-ver-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.owner-ver-chip {
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.owner-ver-chip b {
+  color: var(--ink);
+  margin-left: 4px;
+}
+
 .section {
   padding: 48px 20px 60px;
 }
@@ -599,6 +704,10 @@ button {
   }
 
   .videos-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .owner-stats-kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
