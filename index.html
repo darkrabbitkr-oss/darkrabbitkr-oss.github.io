@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ko" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Darkrabbit Game Dev — 팬게임 개발 아카이브</title>
+    <link rel="icon" type="image/png" href="./media/icon.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">본문으로 바로가기</a>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="./">
+          <span class="brand-badge" aria-hidden="true">DR</span>
+          <span class="brand-text">
+            <strong>Darkrabbit Game Dev</strong>
+            <small>팬게임 · 인디게임 개발 아카이브</small>
+          </span>
+        </a>
+
+        <nav class="topnav" aria-label="주요 메뉴">
+          <a href="#games">프로젝트</a>
+          <a href="#videos">개발 영상</a>
+          <a href="https://github.com/darkrabbitkr-oss" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+
+        <div class="topbar-actions">
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="테마 전환">
+            <span id="theme-icon" aria-hidden="true"></span>
+            <span id="theme-label">다크 모드</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <h1 class="hero-title">만화의 명장면을<br />직접 조작하는 즐거움.</h1>
+            <p class="hero-desc">
+              원작 고증과 실시간 손맛을 담아 제작한 픽셀 전술·액션 팬게임을 한곳에 모았습니다.
+              설치 파일 다운로드부터 브라우저 즉시 플레이, 개발 영상까지 바로 확인하세요.
+            </p>
+            <div class="hero-cta">
+              <a class="btn btn-primary" href="./eyeshield21/">
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polygon points="6,4 20,12 6,20" fill="currentColor" stroke="none"></polygon>
+                </svg>
+                <span>아이실드 21 보기</span>
+              </a>
+              <a class="btn btn-secondary" href="./eyeshield21/play/" target="_blank" rel="noopener noreferrer">
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M2 12h20"></path>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+                <span>웹에서 바로 플레이</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-showcase">
+            <div class="showcase-frame">
+              <img src="./media/bg_eyeshield21_pixel.png" alt="아이실드 21 팬게임 키비주얼" />
+              <div class="showcase-scrim"></div>
+              <div class="showcase-caption">
+                <span class="status-pill status-live"><i class="dot" aria-hidden="true"></i>LATEST · v0.1.2</span>
+                <strong>아이실드 21 : 택티컬 풋볼 매니저</strong>
+                <p>11v11 실시간 조작 · 원작 106종 한글 컷인 · Win/macOS/Android/Web</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="games" class="section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2 class="section-title">개발 프로젝트 목록</h2>
+              <p class="section-sub">공개 배포 중인 작품과 다음 개발 라인업입니다.</p>
+            </div>
+          </div>
+
+          <div class="games-grid">
+            <article class="game-card game-card-featured">
+              <div class="game-thumb">
+                <img src="./media/shot_gameplay.jpg" alt="아이실드 21 실시간 경기 화면" loading="lazy" />
+                <img class="game-emblem" src="./media/logo_eyeshield21_emblem.png" alt="아이실드 21 로고" />
+              </div>
+              <div class="game-body">
+                <div class="game-meta">
+                  <span class="status-pill status-live"><i class="dot" aria-hidden="true"></i>공개 배포 · v0.1.2</span>
+                  <span class="platform-tags tabular">Win · macOS · Android · Web</span>
+                </div>
+                <h3>아이실드 21 : 택티컬 풋볼 매니저</h3>
+                <p>
+                  11 vs 11 실시간 미식축구 액션과 42팀 871명 감독 커리어, 9챕터 원작 스토리,
+                  정발판 명칭 고증 필살기 106종 컷인을 담았습니다. 4.2초 대시 템포 밸런스 및
+                  아군·상대 AI 스킬 발동을 지원합니다.
+                </p>
+                <div class="game-specs">
+                  <div><span>필살기 컷인</span><strong>원작 106종</strong></div>
+                  <div><span>팀 · 로스터</span><strong>42팀 · 871명</strong></div>
+                  <div><span>설치 패키지</span><strong>EXE · DMG · APK</strong></div>
+                </div>
+                <div class="game-actions">
+                  <a class="btn btn-primary" href="./eyeshield21/">
+                    <span>게임 소개 &amp; 다운로드</span>
+                    <svg class="icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12h14"></path>
+                      <path d="M12 5l7 7-7 7"></path>
+                    </svg>
+                  </a>
+                  <a class="btn btn-secondary" href="./eyeshield21/play/" target="_blank" rel="noopener noreferrer">
+                    <span>웹 즉시 플레이</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article class="game-card game-card-upcoming">
+              <div class="game-blueprint">
+                <div class="blueprint-label">
+                  <span class="status-pill status-soon">COMING SOON · 개발 예정</span>
+                  <strong>GRAND LINE PROJECT</strong>
+                  <small>Next Slot: ./onepiece/</small>
+                </div>
+              </div>
+              <div class="game-body">
+                <div class="game-meta">
+                  <span class="status-pill status-soon">준비 중</span>
+                  <span class="platform-tags">PC · Web 예정</span>
+                </div>
+                <h3>원피스 팬게임 프로젝트 (가제)</h3>
+                <p>
+                  아이실드 21 이후 다음 차기작으로 준비 중인 원피스 세계관 팬게임입니다.
+                  개발 영상과 테스트 빌드가 준비되면 이 포털과 전용 플레이 페이지에서 바로 공개됩니다.
+                </p>
+                <div class="game-specs">
+                  <div><span>공개 경로</span><strong>./onepiece/</strong></div>
+                  <div><span>현재 단계</span><strong>기획 및 프로토타입</strong></div>
+                  <div><span>유튜브 소식</span><strong>Darkrabbit 채널</strong></div>
+                </div>
+                <div class="game-actions">
+                  <a class="btn btn-outline" href="https://youtu.be/3Z5S5-ZPR2E" target="_blank" rel="noopener noreferrer">
+                    <span>유튜브 채널 소식 보기</span>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="videos" class="section section-alt">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2 class="section-title">Darkrabbit 개발 유튜브 영상</h2>
+              <p class="section-sub">트레일러와 기능별 쇼츠 가이드를 바로 시청할 수 있습니다.</p>
+            </div>
+          </div>
+
+          <div class="videos-strip">
+            <a class="video-link-card" href="https://youtu.be/3Z5S5-ZPR2E" target="_blank" rel="noopener noreferrer">
+              <img src="./media/shot_cutin_d4d.jpg" alt="공식 트레일러 썸네일" loading="lazy" />
+              <div class="video-link-meta">
+                <span class="tag">16:9 트레일러 · 00:31</span>
+                <strong>아이실드 21 공식 개발 트레일러</strong>
+              </div>
+            </a>
+            <a class="video-link-card" href="https://youtube.com/shorts/4JkZkwlExxA" target="_blank" rel="noopener noreferrer">
+              <div class="video-link-badge">9:16 SHORTS · 00:31</div>
+              <div class="video-link-meta">
+                <span class="tag">대표 쇼츠</span>
+                <strong>세로 프리뷰 · 광속 돌파 컷인</strong>
+              </div>
+            </a>
+            <a class="video-link-card" href="https://youtube.com/shorts/M9V0SXmyxPk" target="_blank" rel="noopener noreferrer">
+              <div class="video-link-badge">9:16 SHORTS · 00:23</div>
+              <div class="video-link-meta">
+                <span class="tag">쇼츠 01</span>
+                <strong>실시간 11v11 조작 완전 가이드</strong>
+              </div>
+            </a>
+            <a class="video-link-card" href="https://youtube.com/shorts/mzYPSBvSbwo" target="_blank" rel="noopener noreferrer">
+              <div class="video-link-badge">9:16 SHORTS · 00:25</div>
+              <div class="video-link-meta">
+                <span class="tag">쇼츠 02</span>
+                <strong>원작 정발판 필살기 한글 컷인 106종</strong>
+              </div>
+            </a>
+            <a class="video-link-card" href="https://youtube.com/shorts/_nxQRk0fkFg" target="_blank" rel="noopener noreferrer">
+              <div class="video-link-badge">9:16 SHORTS · 00:23</div>
+              <div class="video-link-meta">
+                <span class="tag">쇼츠 03</span>
+                <strong>9챕터 스토리 &amp; 42팀 감독 커리어</strong>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <p>Darkrabbit Game Dev — 비공식 팬메이드 게임 아카이브</p>
+        <div class="footer-links">
+          <a href="./eyeshield21/">아이실드 21 포털</a>
+          <a href="./eyeshield21/play/" target="_blank" rel="noopener noreferrer">웹 플레이</a>
+          <a href="https://github.com/darkrabbitkr-oss/eyeshield21/releases" target="_blank" rel="noopener noreferrer">릴리스 다운로드</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
