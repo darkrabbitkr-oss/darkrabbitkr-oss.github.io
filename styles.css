@@ -438,6 +438,11 @@ button {
   color: var(--ink);
 }
 
+.owner-kpi small {
+  font-size: 0.74rem;
+  color: var(--ink-subtle);
+}
+
 .owner-ver-list {
   display: flex;
   flex-wrap: wrap;
@@ -453,9 +458,24 @@ button {
   color: var(--ink-muted);
 }
 
+.owner-ver-chip-human {
+  border-color: rgba(247, 208, 70, 0.45);
+  color: var(--ink);
+}
+
 .owner-ver-chip b {
   color: var(--ink);
   margin-left: 4px;
+}
+
+.owner-ver-chip-human b {
+  color: var(--gold);
+}
+
+.owner-ver-chip small {
+  margin-left: 3px;
+  font-size: 0.72rem;
+  color: var(--ink-subtle);
 }
 
 .section {

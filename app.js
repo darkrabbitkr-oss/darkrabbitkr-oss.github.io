@@ -1,10 +1,10 @@
 (function () {
   const KEY = 'dr-hub-theme';
   const OWNER_KEY = 'dr-owner-stats';
-  const CACHE_KEY = 'dr-hub-dl-cache-v2';
+  const CACHE_KEY = 'dr-hub-dl-cache-v3';
   const CACHE_TTL_MS = 60000;
-  const ES21_API_URL = 'https://api.github.com/repos/darkrabbitkr-oss/eyeshield21/releases?per_page=30';
-  const OPGV_API_URL = 'https://api.github.com/repos/darkrabbitkr-oss/onepiece/releases?per_page=30';
+  const ES21_API_URL = 'https://api.github.com/repos/darkrabbitkr-oss/eyeshield21/releases?per_page=100';
+  const OPGV_API_URL = 'https://api.github.com/repos/darkrabbitkr-oss/onepiece/releases?per_page=100';
 
   const html = document.documentElement;
   const toggleBtn = document.getElementById('theme-toggle');
@@ -93,33 +93,66 @@
 
   function parseRepoReleases(json) {
     const byPlatform = { winSetup: 0, winPortable: 0, winZip: 0, macDmg: 0, androidApk: 0, other: 0 };
+    const humanByPlatform = { winSetup: 0, winPortable: 0, winZip: 0, macDmg: 0, androidApk: 0, other: 0 };
     let total = 0;
+    let humanTotal = 0;
+    let botTotal = 0;
 
     const releases = (Array.isArray(json) ? json : []).map((rel) => {
+      const rawAssets = Array.isArray(rel.assets) ? rel.assets : [];
+      const rawCounts = rawAssets.map((a) => Number(a.download_count || 0) || 0);
+      const botSweepPerAsset = rawCounts.length >= 2 ? Math.min(...rawCounts) : 0;
+
       let relTotal = 0;
-      const assets = (Array.isArray(rel.assets) ? rel.assets : []).map((asset) => {
+      let relHumanTotal = 0;
+      let relBotTotal = 0;
+
+      const assets = rawAssets.map((asset) => {
         const name = String(asset.name || '');
         const lower = name.toLowerCase();
         const count = Number(asset.download_count || 0) || 0;
+        const humanCount = Math.max(0, count - botSweepPerAsset);
+        const botCount = count - humanCount;
+
         relTotal += count;
+        relHumanTotal += humanCount;
+        relBotTotal += botCount;
         total += count;
-        if (lower.includes('-setup-') && lower.endsWith('.exe')) byPlatform.winSetup += count;
-        else if (lower.includes('-portable-') && lower.endsWith('.exe')) byPlatform.winPortable += count;
-        else if (lower.endsWith('.zip')) byPlatform.winZip += count;
-        else if (lower.endsWith('.dmg')) byPlatform.macDmg += count;
-        else if (lower.endsWith('.apk')) byPlatform.androidApk += count;
-        else byPlatform.other += count;
-        return { name, count };
+        humanTotal += humanCount;
+        botTotal += botCount;
+
+        if (lower.includes('-setup-') && lower.endsWith('.exe')) {
+          byPlatform.winSetup += count;
+          humanByPlatform.winSetup += humanCount;
+        } else if (lower.includes('-portable-') && lower.endsWith('.exe')) {
+          byPlatform.winPortable += count;
+          humanByPlatform.winPortable += humanCount;
+        } else if (lower.endsWith('.zip')) {
+          byPlatform.winZip += count;
+          humanByPlatform.winZip += humanCount;
+        } else if (lower.endsWith('.dmg')) {
+          byPlatform.macDmg += count;
+          humanByPlatform.macDmg += humanCount;
+        } else if (lower.endsWith('.apk')) {
+          byPlatform.androidApk += count;
+          humanByPlatform.androidApk += humanCount;
+        } else {
+          byPlatform.other += count;
+          humanByPlatform.other += humanCount;
+        }
+        return { name, count, humanCount };
       });
       return {
         tag: String(rel.tag_name || ''),
         publishedAt: rel.published_at ? String(rel.published_at).slice(0, 10) : '',
         total: relTotal,
+        humanTotal: relHumanTotal,
+        botTotal: relBotTotal,
         assets,
       };
     });
 
-    return { total, byPlatform, releases };
+    return { total, humanTotal, botTotal, byPlatform, humanByPlatform, releases };
   }
 
   async function fetchStats(force) {
@@ -149,6 +182,8 @@
     const op = parseRepoReleases(opJson);
     const stats = {
       grandTotal: es.total + op.total,
+      grandHumanTotal: es.humanTotal + op.humanTotal,
+      grandBotTotal: es.botTotal + op.botTotal,
       es,
       op,
       fetchedAt: Date.now(),
@@ -189,10 +224,12 @@
 
       const verChips = [
         ...stats.op.releases.map(
-          (r) => `<span class="owner-ver-chip tabular">OPGV ${escapeHtml(r.tag)} <b>${r.total.toLocaleString('ko-KR')}회</b></span>`,
+          (r) =>
+            `<span class="owner-ver-chip${r.humanTotal > 0 ? ' owner-ver-chip-human' : ''} tabular">OPGV ${escapeHtml(r.tag)} <b>실유저 ${r.humanTotal.toLocaleString('ko-KR')}회</b><small>(원본 ${r.total.toLocaleString('ko-KR')})</small></span>`,
         ),
-        ...stats.es.releases.slice(0, 6).map(
-          (r) => `<span class="owner-ver-chip tabular">ES21 ${escapeHtml(r.tag)} <b>${r.total.toLocaleString('ko-KR')}회</b></span>`,
+        ...stats.es.releases.slice(0, 8).map(
+          (r) =>
+            `<span class="owner-ver-chip${r.humanTotal > 0 ? ' owner-ver-chip-human' : ''} tabular">ES21 ${escapeHtml(r.tag)} <b>실유저 ${r.humanTotal.toLocaleString('ko-KR')}회</b><small>(원본 ${r.total.toLocaleString('ko-KR')})</small></span>`,
         ),
       ].join('');
 
@@ -202,7 +239,7 @@
             <div class="owner-stats-top">
               <div>
                 <span class="status-pill status-soon">OWNER STATS · 본인 브라우저 전용 (Alt+Shift+D)</span>
-                <p class="owner-stats-note">전체 팬게임 누적 다운로드 실측 · 갱신 ${escapeHtml(timeStr)}</p>
+                <p class="owner-stats-note">전체 팬게임 실유저 추정 다운로드 (일괄 봇스캔 -${stats.grandBotTotal.toLocaleString('ko-KR')}회 제외) · 갱신 ${escapeHtml(timeStr)}</p>
               </div>
               <div class="owner-stats-controls">
                 <a class="owner-mini-btn" href="./onepiece/#downloads">원피스 상세</a>
@@ -212,10 +249,10 @@
               </div>
             </div>
             <div class="owner-stats-kpis">
-              <div class="owner-kpi"><span>전체 합계</span><strong class="tabular">${stats.grandTotal.toLocaleString('ko-KR')}회</strong></div>
-              <div class="owner-kpi"><span>원피스 (DMG ${stats.op.byPlatform.macDmg} · ZIP ${stats.op.byPlatform.winZip})</span><strong class="tabular">${stats.op.total.toLocaleString('ko-KR')}회</strong></div>
-              <div class="owner-kpi"><span>아이실드 21 누적</span><strong class="tabular">${stats.es.total.toLocaleString('ko-KR')}회</strong></div>
-              <div class="owner-kpi"><span>OPGV macOS / Win</span><strong class="tabular">${stats.op.byPlatform.macDmg} / ${stats.op.byPlatform.winZip}</strong></div>
+              <div class="owner-kpi"><span>전체 실유저 합계</span><strong class="tabular">${stats.grandHumanTotal.toLocaleString('ko-KR')}회</strong><small class="tabular">원본 ${stats.grandTotal.toLocaleString('ko-KR')}회 · 봇 -${stats.grandBotTotal.toLocaleString('ko-KR')}</small></div>
+              <div class="owner-kpi"><span>원피스 실유저 (DMG ${stats.op.humanByPlatform.macDmg} · ZIP ${stats.op.humanByPlatform.winZip})</span><strong class="tabular">${stats.op.humanTotal.toLocaleString('ko-KR')}회</strong><small class="tabular">원본 ${stats.op.total.toLocaleString('ko-KR')}회</small></div>
+              <div class="owner-kpi"><span>아이실드 21 실유저</span><strong class="tabular">${stats.es.humanTotal.toLocaleString('ko-KR')}회</strong><small class="tabular">원본 ${stats.es.total.toLocaleString('ko-KR')}회 · 봇 -${stats.es.botTotal.toLocaleString('ko-KR')}</small></div>
+              <div class="owner-kpi"><span>ES21 플랫폼별 실유저</span><strong class="tabular">Win ${stats.es.humanByPlatform.winSetup + stats.es.humanByPlatform.winPortable} · Mac ${stats.es.humanByPlatform.macDmg} · APK ${stats.es.humanByPlatform.androidApk}</strong><small class="tabular">설치형 ${stats.es.humanByPlatform.winSetup} · 포터블 ${stats.es.humanByPlatform.winPortable}</small></div>
             </div>
             <div class="owner-ver-list">${verChips}</div>
           </div>
