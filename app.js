@@ -1,9 +1,10 @@
 (function () {
   const KEY = 'dr-hub-theme';
   const OWNER_KEY = 'dr-owner-stats';
-  const CACHE_KEY = 'dr-es21-dl-cache';
+  const CACHE_KEY = 'dr-hub-dl-cache-v2';
   const CACHE_TTL_MS = 60000;
-  const API_URL = 'https://api.github.com/repos/darkrabbitkr-oss/eyeshield21/releases?per_page=30';
+  const ES21_API_URL = 'https://api.github.com/repos/darkrabbitkr-oss/eyeshield21/releases?per_page=30';
+  const OPGV_API_URL = 'https://api.github.com/repos/darkrabbitkr-oss/onepiece/releases?per_page=30';
 
   const html = document.documentElement;
   const toggleBtn = document.getElementById('theme-toggle');
@@ -90,6 +91,37 @@
     return isOwnerEnabled();
   }
 
+  function parseRepoReleases(json) {
+    const byPlatform = { winSetup: 0, winPortable: 0, winZip: 0, macDmg: 0, androidApk: 0, other: 0 };
+    let total = 0;
+
+    const releases = (Array.isArray(json) ? json : []).map((rel) => {
+      let relTotal = 0;
+      const assets = (Array.isArray(rel.assets) ? rel.assets : []).map((asset) => {
+        const name = String(asset.name || '');
+        const lower = name.toLowerCase();
+        const count = Number(asset.download_count || 0) || 0;
+        relTotal += count;
+        total += count;
+        if (lower.includes('-setup-') && lower.endsWith('.exe')) byPlatform.winSetup += count;
+        else if (lower.includes('-portable-') && lower.endsWith('.exe')) byPlatform.winPortable += count;
+        else if (lower.endsWith('.zip')) byPlatform.winZip += count;
+        else if (lower.endsWith('.dmg')) byPlatform.macDmg += count;
+        else if (lower.endsWith('.apk')) byPlatform.androidApk += count;
+        else byPlatform.other += count;
+        return { name, count };
+      });
+      return {
+        tag: String(rel.tag_name || ''),
+        publishedAt: rel.published_at ? String(rel.published_at).slice(0, 10) : '',
+        total: relTotal,
+        assets,
+      };
+    });
+
+    return { total, byPlatform, releases };
+  }
+
   async function fetchStats(force) {
     if (!force) {
       try {
@@ -105,39 +137,23 @@
       }
     }
 
-    const res = await fetch(API_URL, {
-      headers: { Accept: 'application/vnd.github+json' },
-    });
-    if (!res.ok) throw new Error('GitHub API HTTP ' + res.status);
-    const json = await res.json();
+    const [esRes, opRes] = await Promise.all([
+      fetch(ES21_API_URL, { headers: { Accept: 'application/vnd.github+json' } }),
+      fetch(OPGV_API_URL, { headers: { Accept: 'application/vnd.github+json' } }),
+    ]);
 
-    const byPlatform = { winSetup: 0, winPortable: 0, macDmg: 0, androidApk: 0, other: 0 };
-    let total = 0;
+    const esJson = esRes.ok ? await esRes.json() : [];
+    const opJson = opRes.ok ? await opRes.json() : [];
 
-    const releases = (Array.isArray(json) ? json : []).map((rel) => {
-      let relTotal = 0;
-      const assets = (Array.isArray(rel.assets) ? rel.assets : []).map((asset) => {
-        const name = String(asset.name || '');
-        const lower = name.toLowerCase();
-        const count = Number(asset.download_count || 0) || 0;
-        relTotal += count;
-        total += count;
-        if (lower.includes('-setup-') && lower.endsWith('.exe')) byPlatform.winSetup += count;
-        else if (lower.includes('-portable-') && lower.endsWith('.exe')) byPlatform.winPortable += count;
-        else if (lower.endsWith('.dmg')) byPlatform.macDmg += count;
-        else if (lower.endsWith('.apk')) byPlatform.androidApk += count;
-        else byPlatform.other += count;
-        return { name, count };
-      });
-      return {
-        tag: String(rel.tag_name || ''),
-        publishedAt: rel.published_at ? String(rel.published_at).slice(0, 10) : '',
-        total: relTotal,
-        assets,
-      };
-    });
+    const es = parseRepoReleases(esJson);
+    const op = parseRepoReleases(opJson);
+    const stats = {
+      grandTotal: es.total + op.total,
+      es,
+      op,
+      fetchedAt: Date.now(),
+    };
 
-    const stats = { total, byPlatform, releases, fetchedAt: Date.now() };
     try {
       sessionStorage.setItem(CACHE_KEY, JSON.stringify(stats));
     } catch {
@@ -165,12 +181,20 @@
       const stats = await fetchStats(force);
       if (!isOwnerEnabled()) return;
 
-      const winTotal = stats.byPlatform.winSetup + stats.byPlatform.winPortable;
       const timeStr = new Date(stats.fetchedAt).toLocaleTimeString('ko-KR', {
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
       });
+
+      const verChips = [
+        ...stats.op.releases.map(
+          (r) => `<span class="owner-ver-chip tabular">OPGV ${escapeHtml(r.tag)} <b>${r.total.toLocaleString('ko-KR')}회</b></span>`,
+        ),
+        ...stats.es.releases.slice(0, 6).map(
+          (r) => `<span class="owner-ver-chip tabular">ES21 ${escapeHtml(r.tag)} <b>${r.total.toLocaleString('ko-KR')}회</b></span>`,
+        ),
+      ].join('');
 
       statsBar.innerHTML = `
         <div class="container">
@@ -178,28 +202,22 @@
             <div class="owner-stats-top">
               <div>
                 <span class="status-pill status-soon">OWNER STATS · 본인 브라우저 전용 (Alt+Shift+D)</span>
-                <p class="owner-stats-note">아이실드 21 누적 다운로드 실측 · 갱신 ${escapeHtml(timeStr)}</p>
+                <p class="owner-stats-note">전체 팬게임 누적 다운로드 실측 · 갱신 ${escapeHtml(timeStr)}</p>
               </div>
               <div class="owner-stats-controls">
-                <a class="owner-mini-btn" href="./eyeshield21/#downloads">상세 보기</a>
+                <a class="owner-mini-btn" href="./onepiece/#downloads">원피스 상세</a>
+                <a class="owner-mini-btn" href="./eyeshield21/#downloads">아이실드 상세</a>
                 <button class="owner-mini-btn" id="hub-stats-refresh" type="button">새로고침</button>
                 <button class="owner-mini-btn" id="hub-stats-hide" type="button">숨기기</button>
               </div>
             </div>
             <div class="owner-stats-kpis">
-              <div class="owner-kpi"><span>전체 누적</span><strong class="tabular">${stats.total.toLocaleString('ko-KR')}회</strong></div>
-              <div class="owner-kpi"><span>Windows (.exe)</span><strong class="tabular">${winTotal.toLocaleString('ko-KR')}</strong></div>
-              <div class="owner-kpi"><span>macOS (.dmg)</span><strong class="tabular">${stats.byPlatform.macDmg.toLocaleString('ko-KR')}</strong></div>
-              <div class="owner-kpi"><span>Android (.apk)</span><strong class="tabular">${stats.byPlatform.androidApk.toLocaleString('ko-KR')}</strong></div>
+              <div class="owner-kpi"><span>전체 합계</span><strong class="tabular">${stats.grandTotal.toLocaleString('ko-KR')}회</strong></div>
+              <div class="owner-kpi"><span>원피스 (DMG ${stats.op.byPlatform.macDmg} · ZIP ${stats.op.byPlatform.winZip})</span><strong class="tabular">${stats.op.total.toLocaleString('ko-KR')}회</strong></div>
+              <div class="owner-kpi"><span>아이실드 21 누적</span><strong class="tabular">${stats.es.total.toLocaleString('ko-KR')}회</strong></div>
+              <div class="owner-kpi"><span>OPGV macOS / Win</span><strong class="tabular">${stats.op.byPlatform.macDmg} / ${stats.op.byPlatform.winZip}</strong></div>
             </div>
-            <div class="owner-ver-list">
-              ${stats.releases
-                .map(
-                  (r) =>
-                    `<span class="owner-ver-chip tabular">${escapeHtml(r.tag)} <b>${r.total.toLocaleString('ko-KR')}회</b></span>`,
-                )
-                .join('')}
-            </div>
+            <div class="owner-ver-list">${verChips}</div>
           </div>
         </div>
       `;
